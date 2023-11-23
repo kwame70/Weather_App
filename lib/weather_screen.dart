@@ -1,6 +1,5 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:weather_app/my_card.dart';
 import 'package:weather_app/my_text.dart';
 
 class WeatherScreen extends StatelessWidget {
@@ -18,59 +17,38 @@ class WeatherScreen extends StatelessWidget {
           IconButton(onPressed: () {}, icon: const Icon(Icons.refresh_sharp))
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(14),
+      body: const Padding(
+        padding: EdgeInsets.all(14),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             //main card
             SizedBox(
               width: double.infinity,
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
-                elevation: 10,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: const Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          MyText(
-                            text: "300 °F",
-                            fontSize: 30,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Icon(
-                            Icons.cloud,
-                            size: 64,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          MyText(
-                            text: "Rain",
-                            fontSize: 20,
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              child: MyMainCard(),
             ),
-            const SizedBox(
+            SizedBox(
+              height: 20,
+            ),
+            //Weather forecast cards
+            MyText(
+              text: "Weather Forecast",
+              fontSize: 24,
+            ),
+            SizedBox(
               height: 5,
             ),
-            const MyText(
-              text: "Weather Forecast",
-              fontSize: 30,
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  MyCard(time: "9:00", temp: "300.12"),
+                  MyCard(time: "8:00", temp: "200.11"),
+                  MyCard(time: "7:00", temp: "100.20"),
+                  MyCard(time: "6:00", temp: "210.21"),
+                  MyCard(time: "10:00", temp: "100.12"),
+                ],
+              ),
             )
           ],
         ),
