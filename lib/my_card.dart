@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:weather_app/my_text.dart';
 
 class MyCard extends StatelessWidget {
-  const MyCard({super.key, required this.time, required this.temp});
+  const MyCard(
+      {super.key, required this.time, required this.temp, required this.icon});
   final String time;
   final String temp;
+  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +28,8 @@ class MyCard extends StatelessWidget {
             const SizedBox(
               height: 8,
             ),
-            const Icon(
-              Icons.cloud,
+            Icon(
+              icon,
               size: 32,
             ),
             const SizedBox(
@@ -46,7 +48,11 @@ class MyCard extends StatelessWidget {
 }
 
 class MyMainCard extends StatelessWidget {
-  const MyMainCard({super.key});
+  const MyMainCard(
+      {super.key, required this.temp, required this.icon, required this.cond});
+  final IconData icon;
+  final String temp;
+  final String cond;
 
   @override
   Widget build(BuildContext context) {
@@ -57,29 +63,29 @@ class MyMainCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: const Padding(
-            padding: EdgeInsets.all(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
             child: Column(
               children: [
                 MyText(
-                  text: "300 °F",
+                  text: temp,
                   fontSize: 30,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Icon(
-                  Icons.cloud,
+                  icon,
                   size: 64,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 MyText(
-                  text: "Rain",
+                  text: cond,
                   fontSize: 20,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 5,
                 ),
               ],
