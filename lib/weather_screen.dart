@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:weather_app/my_card.dart';
 import 'package:weather_app/my_container.dart';
 import 'package:weather_app/my_text.dart';
@@ -33,6 +34,13 @@ class _WeatherScreenState extends State<WeatherScreen> {
     }
   }
 
+  late final Future<Map<String, dynamic>> getWeather;
+  @override
+  void initState() {
+    getWeather = getCurrentWeather();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,11 +50,17 @@ class _WeatherScreenState extends State<WeatherScreen> {
         ),
         centerTitle: true,
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.refresh_sharp))
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  getWeather = getCurrentWeather();
+                });
+              },
+              icon: const Icon(Icons.refresh_sharp))
         ],
       ),
       body: FutureBuilder(
-        future: getCurrentWeather(),
+        future: getWeather,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: LinearProgressIndicator());
@@ -55,7 +69,12 @@ class _WeatherScreenState extends State<WeatherScreen> {
             return Center(child: Text(snapshot.error.toString()));
           }
           final data = snapshot.data!;
-          final currentTemp = data["list"][0]["main"]["temp"];
+          final currentWeatherData = data["list"][0];
+          final currentTemp = currentWeatherData["main"]["temp"];
+          final weatherCond = currentWeatherData["weather"][0]["main"];
+          final humidity = currentWeatherData["main"]["humidity"];
+          final windSpeed = currentWeatherData["wind"]["speed"];
+          final pressure = currentWeatherData["main"]["pressure"];
 
           return Padding(
             padding: const EdgeInsets.all(14),
@@ -66,9 +85,12 @@ class _WeatherScreenState extends State<WeatherScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: MyMainCard(
-                    icon: Icons.water,
+                    // checking if weather condition is cloudy or rainy
+                    icon: weatherCond == "Clouds" || weatherCond == "Rain"
+                        ? Icons.cloud
+                        : Icons.sunny,
                     temp: "$currentTemp K",
-                    cond: "rain",
+                    cond: weatherCond,
                   ),
                 ),
                 const SizedBox(
@@ -76,39 +98,32 @@ class _WeatherScreenState extends State<WeatherScreen> {
                 ),
                 //Weather forecast cards
                 const MyText(
-                  text: "Weather Forecast",
+                  text: "Hourly Forecast",
                   fontSize: 24,
                 ),
                 const SizedBox(
                   height: 5,
                 ),
-                const SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      MyCard(
-                        time: "9:00",
-                        temp: "300.12",
-                        icon: Icons.cloud,
-                      ),
-                      MyCard(
-                        time: "1:00",
-                        temp: "200.11",
-                        icon: Icons.sunny,
-                      ),
-                      MyCard(
-                        time: "7:00",
-                        temp: "100.20",
-                        icon: Icons.cloud,
-                      ),
-                      MyCard(time: "3:00", temp: "210.21", icon: Icons.sunny),
-                      MyCard(
-                        time: "10:00",
-                        temp: "100.12",
-                        icon: Icons.cloud,
-                      ),
-                    ],
-                  ),
+
+                SizedBox(
+                  height: 130,
+                  child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 5,
+                      itemBuilder: ((context, index) {
+                        final hourlyForecast = data["list"][index + 1];
+                        final hourlyCond =
+                            data["list"][index + 1]["weather"][0]["main"];
+                        final time = DateTime.parse(hourlyForecast["dt_txt"]);
+                        return MyCard(
+                          time: DateFormat.j().format(time),
+                          temp: hourlyForecast["main"]["temp"].toString(),
+                          icon: hourlyCond.toString() == "Clouds" ||
+                                  hourlyCond.toString() == "Rain"
+                              ? Icons.cloud
+                              : Icons.sunny,
+                        );
+                      })),
                 ),
                 const SizedBox(
                   height: 20,
@@ -118,21 +133,21 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   text: "Additional Information",
                   fontSize: 24,
                 ),
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     MyContainer(
                         icon: Icons.water_drop_rounded,
                         condition: "Humidity",
-                        temp: "94"),
+                        temp: "$humidity"),
                     MyContainer(
                         icon: Icons.air_rounded,
                         condition: "Wind Speed",
-                        temp: "7.67"),
+                        temp: "$windSpeed"),
                     MyContainer(
                         icon: Icons.beach_access_rounded,
                         condition: "Pressure",
-                        temp: "1006"),
+                        temp: "$pressure"),
                   ],
                 ),
               ],

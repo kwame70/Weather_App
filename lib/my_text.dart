@@ -15,6 +15,8 @@ class MyText extends StatelessWidget {
     return Text(
       text,
       style: TextStyle(fontSize: fontSize, fontWeight: fontWeight),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }
